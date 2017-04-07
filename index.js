@@ -1,7 +1,9 @@
 /* @flow */
 
 import React, { Component, Element } from 'react';
+import languages from 'numbro/dist/languages.min';
 import numbro from 'numbro';
+numbro.loadCulturesInNode();
 
 // <NumberInput value={VALUE_TYPE} />
 //
@@ -14,12 +16,15 @@ type VALUE_TYPE = number | null;
 // changed via the prop `format` <NumberInput format="0,0[.00]" value={3.1427} />.
 const DEFAULT_FORMAT = '0,0';
 
+const DEFAULT_CULTURE = 'en-US';
+
 const toFormattedString = (value: VALUE_TYPE, format: string): string => {
   if (value === undefined || value === null) {
     return '';
   }
 
   let boxed = numbro(value);
+
   if (isNaN(boxed.value())) {
     return '';
   }
@@ -72,6 +77,9 @@ type Props = {
   min: VALUE_TYPE,
   max: VALUE_TYPE,
 
+  // culture, see numbro docs for examples, Defaults to 'en-US'
+  culture: string,
+
   // number format: see numbro docs for examples. Defaults to `0,0`.
   format: string,
 
@@ -95,6 +103,7 @@ export default class NumberInput extends Component {
   state: State;
 
   static defaultProps = {
+    culture: DEFAULT_CULTURE,
     format: DEFAULT_FORMAT,
     type: 'tel',
     onChange: (value: number) => value,
@@ -105,7 +114,9 @@ export default class NumberInput extends Component {
   constructor(props: Props) {
     super(props);
 
-    const { format, value } = props;
+    const { culture, format, value } = props;
+
+    numbro.culture(culture);
 
     // TODO: Add support for starting out as focused.
     this.state = {
@@ -184,6 +195,7 @@ export default class NumberInput extends Component {
   render() {
     const { focused, value } = this.state;
     const { format, renderer, ...rest } = this.props;
+    delete rest.culture;
     const displayValue = focused
       ? value
       : toFormattedString(toValue(value), format);
