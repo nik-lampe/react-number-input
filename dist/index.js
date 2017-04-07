@@ -38,6 +38,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _languages = require('numbro/dist/languages.min');
+
+var _languages2 = _interopRequireDefault(_languages);
+
 var _numbro = require('numbro');
 
 var _numbro2 = _interopRequireDefault(_numbro);
@@ -94,7 +98,11 @@ function _inherits(subClass, superClass) {
       : (subClass.__proto__ = superClass);
 }
 
+_numbro2.default.loadCulturesInNode();
+
 var DEFAULT_FORMAT = '0,0';
+
+var DEFAULT_CULTURE = 'en-US';
 
 var toFormattedString = function toFormattedString(value, format) {
   if (value === undefined || value === null) {
@@ -102,6 +110,7 @@ var toFormattedString = function toFormattedString(value, format) {
   }
 
   var boxed = (0, _numbro2.default)(value);
+
   if (isNaN(boxed.value())) {
     return '';
   }
@@ -152,7 +161,9 @@ var NumberInput = (function(_Component) {
 
     _initialiseProps.call(_this);
 
-    var format = props.format, value = props.value;
+    var culture = props.culture, format = props.format, value = props.value;
+
+    _numbro2.default.culture(culture);
 
     _this.state = {
       focused: false,
@@ -185,6 +196,7 @@ var NumberInput = (function(_Component) {
           renderer = _props.renderer,
           rest = _objectWithoutProperties(_props, ['format', 'renderer']);
 
+        delete rest.culture;
         var displayValue = focused
           ? value
           : toFormattedString(toValue(value), format);
@@ -206,6 +218,7 @@ var NumberInput = (function(_Component) {
 })(_react.Component);
 
 NumberInput.defaultProps = {
+  culture: DEFAULT_CULTURE,
   format: DEFAULT_FORMAT,
   type: 'tel',
   onChange: function onChange(value) {
